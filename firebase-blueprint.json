@@ -1,0 +1,147 @@
+{
+  "entities": {
+    "News": {
+      "title": "News Item",
+      "description": "A news or spoiler post on PK XD Central",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "excerpt": { "type": "string" },
+        "content": { "type": "string" },
+        "category": { "type": "string", "enum": ["spoilers", "updates", "codes", "events"] },
+        "imageUrl": { "type": "string" },
+        "date": { "type": "string" },
+        "author": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "excerpt", "content", "category", "date", "author"]
+    },
+    "AppSettings": {
+      "title": "Application Settings",
+      "description": "Global settings for PK XD Central",
+      "type": "object",
+      "properties": {
+        "logoUrl": { "type": "string" },
+        "spoilerTitle": { "type": "string" },
+        "spoilerDesc": { "type": "string" },
+        "adminPasskey": { "type": "string" }
+      },
+      "required": ["logoUrl", "spoilerTitle", "spoilerDesc", "adminPasskey"]
+    },
+    "PastSpoiler": {
+      "title": "Past Spoiler",
+      "description": "A historic spoiler published on PK XD Central",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "title", "description", "createdAt"]
+    },
+    "FeaturedVideo": {
+      "title": "Featured Video",
+      "description": "Highlight gameplay or panel video",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "youtubeUrl": { "type": "string" },
+        "type": { "type": "string", "enum": ["game_highlight", "panel_video"] },
+        "author": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "title", "youtubeUrl", "type", "createdAt"]
+    },
+    "Theory": {
+      "title": "Theory",
+      "description": "A fan-contributed or admin theory",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "author": { "type": "string" },
+        "likes": { "type": "number" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "title", "content", "author", "likes", "createdAt"]
+    },
+    "ShortItem": {
+      "title": "Short Item",
+      "description": "A short format YouTube video item",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "youtubeUrl": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "title", "youtubeUrl", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification Log",
+      "description": "Notification log sent from administrators",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "body": { "type": "string" },
+        "type": { "type": "string", "enum": ["story_published", "countdown_alert", "custom_push", "delayed_alert"] },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "title", "body", "type", "createdAt"]
+    },
+    "LeaderboardPlayer": {
+      "title": "Leaderboard Player",
+      "description": "A real user profile for tracking XP and Flames",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "level": { "type": "number" },
+        "xp": { "type": "number" },
+        "flames": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["id", "name", "level", "xp", "flames", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/news/{newsId}": {
+      "schema": "News",
+      "description": "Collection of community news and updates"
+    },
+    "/settings/{settingsId}": {
+      "schema": "AppSettings",
+      "description": "Global application configuration settings"
+    },
+    "/past_spoilers/{spoilerId}": {
+      "schema": "PastSpoiler",
+      "description": "Collection of past spoilers published on the site"
+    },
+    "/featured_videos/{videoId}": {
+      "schema": "FeaturedVideo",
+      "description": "Collection of featured homepage videos"
+    },
+    "/theories/{theoryId}": {
+      "schema": "Theory",
+      "description": "Collection of theories about PK XD"
+    },
+    "/shorts/{shortId}": {
+      "schema": "ShortItem",
+      "description": "Collection of curated community YouTube shorts"
+    },
+    "/notifications/{notifId}": {
+      "schema": "Notification",
+      "description": "Collection of push notification logs"
+    },
+    "/leaderboard/{playerId}": {
+      "schema": "LeaderboardPlayer",
+      "description": "Collection of real-player leaderboard stats"
+    }
+  }
+}

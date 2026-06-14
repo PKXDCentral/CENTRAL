@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Fredoka", "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  /* Overwrite dark panels/backgrounds to use the gorgeous rich deep PK XD purple/indigo hues */
+  --color-slate-950: #1b023d; /* Dark Royal Purple-Indigo background */
+  --color-slate-900: #290854; /* Royal Purple dark */
+  --color-zinc-950: #120029;  /* Deepest Purple-Black */
+  --color-zinc-900: #1e0240;  /* Rich Dark Purple */
+  --color-zinc-850: #280452;
+  --color-zinc-800: #330864;
+  --color-neutral-950: #160033;
+  --color-neutral-900: #24004d;
+  
+  /* Customize specific PK XD Purple spectrum */
+  --color-purple-950: #14002e;
+  --color-purple-900: #24024f;
+  --color-purple-800: #360175;
+  --color-purple-700: #5200aa;
+  --color-purple-600: #7c12eb; /* Vibrant Main PK XD Purple from screen */
+  --color-purple-500: #943bf0;
+  
+  --color-indigo-950: #110029;
+  --color-indigo-900: #21024b;
+  
+  /* Bright accents */
+  --color-yellow-400: #ffe600; /* Vibrant Neon Yellow from screenshot */
+  --color-yellow-300: #ffe600;
+  --color-cyan-400: #00f0ff;   /* Neon Cyan */
+  --color-pink-500: #ff007a;   /* Hot Magenta */
+}
+
+/* Custom background texture replicating playpkxd.com watermark styles */
+.bg-pkxd-texture {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M30,30 Q30,25 35,25 Q40,25 40,30 Q40,35 35,35 Q30,35 30,30 Z' fill='rgba(255,255,255,0.025)'/%3E%3Cpath d='M50,30 Q50,25 55,25 Q60,25 60,30 Q60,35 55,35 Q50,35 50,30 Z' fill='rgba(255,255,255,0.025)'/%3E%3Cpath d='M35,48 Q45,55 55,48' stroke='rgba(255,255,255,0.025)' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M100,85 L105,90 M105,85 L100,90' stroke='rgba(255,255,255,0.025)' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='92' cy='25' r='2.5' fill='rgba(255,255,255,0.025)'/%3E%3Cpath d='M15,90 L18,97 L25,94 L15,90' stroke='rgba(255,255,255,0.02)' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
