@@ -36,7 +36,7 @@ import { playTapSound, playLevelUpSound, playSuccessSound } from './utils/audio'
 
 // Import Firebase config & helpers
 import { auth, db, googleProvider, OperationType, handleFirestoreError } from './firebase';
-import { onAuthStateChanged, signInWithPopup, signOut, User } from 'firebase/auth';
+import { onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, User, GoogleAuthProvider } from 'firebase/auth';
 import { collection, doc, onSnapshot, setDoc, deleteDoc } from 'firebase/firestore';
 
 export default function App() {
@@ -218,6 +218,43 @@ export default function App() {
       }
     });
     return () => unsubscribe();
+  }, []);
+
+  // Capture Google login Redirect results (Resolves popup-closed errors on mobile)
+  useEffect(() => {
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result?.user) {
+          triggerAudio('success');
+          
+          // Check if this redirect was specifically for connecting Gmail
+          let isGmailPending = false;
+          try {
+            isGmailPending = localStorage.getItem('pending_gmail_connect') === 'true';
+          } catch (e) {}
+          
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          if (isGmailPending && credential?.accessToken) {
+            try {
+              localStorage.setItem('pkxd_gmail_token', credential.accessToken);
+              localStorage.removeItem('pending_gmail_connect');
+            } catch (e) {}
+            setNotifMessage(`🔌 Gmail do Admin conectado com sucesso via redirecionamento! 🎉`);
+          } else {
+            setNotifMessage(`Bem-vindo, ${result.user.displayName || 'Admin'}! 🎉`);
+          }
+          
+          setTimeout(() => setNotifMessage(null), 4000);
+        }
+      })
+      .catch((error: any) => {
+        console.error("Redirect login failed:", error);
+        let errorMsg = error?.message || String(error);
+        if (error?.code === 'auth/unauthorized-domain' || errorMsg.includes('unauthorized-domain') || errorMsg.includes('domain-not-authorized')) {
+          errorMsg = `⚠️ DOMÍNIO NÃO AUTORIZADO NO FIREBASE! O domínio atual do seu site ("${window.location.hostname}") não está cadastrado ou autorizado no seu projeto do Firebase. Você precisa adicionar "${window.location.hostname}" na lista de Domínios Autorizados no seu Firebase Console (Authentication > Configurações > Domínios Autorizados) para liberar o login com o Google!`;
+        }
+        setGoogleAuthError(errorMsg);
+      });
   }, []);
 
   // Realtime Firebase news listener
@@ -532,6 +569,22 @@ export default function App() {
       }
       setGoogleAuthError(errorMsg);
     } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
+  const handleLoginRedirect = async () => {
+    setIsAuthenticating(true);
+    setGoogleAuthError(null);
+    try {
+      await signInWithRedirect(auth, googleProvider);
+    } catch (error: any) {
+      console.error("Redirect login failed:", error);
+      let errorMsg = error?.message || String(error);
+      if (error?.code === 'auth/unauthorized-domain' || errorMsg.includes('unauthorized-domain') || errorMsg.includes('domain-not-authorized')) {
+        errorMsg = `⚠️ DOMÍNIO NÃO AUTORIZADO NO FIREBASE! O domínio atual do seu site ("${window.location.hostname}") não está cadastrado ou autorizado no seu projeto do Firebase. Você precisa adicionar "${window.location.hostname}" na lista de Domínios Autorizados nas configurações do seu Firebase Console (Authentication > Configurações > Domínios Autorizados) para liberar o login com o Google!`;
+      }
+      setGoogleAuthError(errorMsg);
       setIsAuthenticating(false);
     }
   };
@@ -1278,14 +1331,23 @@ export default function App() {
                       </button>
                     ) : (
                       <div className="w-full space-y-4">
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                        <div className="flex flex-col md:flex-row items-stretch justify-center gap-3 max-w-2xl mx-auto">
                           <button
                             onClick={handleLogin}
                             disabled={isAuthenticating}
-                            className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-sans font-black text-xs sm:text-sm rounded-xl border-b-4 border-indigo-900 active:border-b-0 cursor-pointer shadow-lg transition-transform duration-100 flex items-center justify-center gap-2"
+                            className="w-full md:w-auto md:flex-1 px-5 py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-sans font-black text-xs sm:text-sm rounded-xl border-b-4 border-indigo-900 active:border-b-0 cursor-pointer shadow-lg transition-all flex items-center justify-center gap-2"
                           >
                             <Lock className="w-4 h-4" />
-                            <span>{isAuthenticating ? 'ENTRANDO...' : 'LOGAR COM CONTA GOOGLE DO ADMIN'}</span>
+                            <span>{isAuthenticating ? 'ENTRANDO...' : '🔐 LOGIN VIA POPUP'}</span>
+                          </button>
+
+                          <button
+                            onClick={handleLoginRedirect}
+                            disabled={isAuthenticating}
+                            className="w-full md:w-auto md:flex-1 px-5 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-sans font-black text-xs sm:text-sm rounded-xl border-b-4 border-cyan-900 active:border-b-0 cursor-pointer shadow-lg transition-all flex items-center justify-center gap-2"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            <span>{isAuthenticating ? 'ENTRANDO...' : '📱 LOGIN REDIRECIONAR (CELULAR)'}</span>
                           </button>
 
                           <button
@@ -1293,9 +1355,9 @@ export default function App() {
                               setUseBackupPasscode(!useBackupPasscode);
                               setPasscodeError('');
                             }}
-                            className="w-full sm:w-auto px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl font-sans font-black text-xs uppercase tracking-wider cursor-pointer border border-zinc-700"
+                            className="w-full md:w-auto px-5 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl font-sans font-black text-xs uppercase tracking-wider cursor-pointer border border-zinc-700 flex items-center justify-center"
                           >
-                            {useBackupPasscode ? 'Cancelar' : 'Entrar com Código PIN'}
+                            {useBackupPasscode ? 'Cancelar' : '🔑 CÓDIGO PIN'}
                           </button>
                         </div>
 

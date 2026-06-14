@@ -6,7 +6,8 @@ import {
 } from 'lucide-react';
 import { playTapSound, playSuccessSound } from '../utils/audio';
 import { auth } from '../firebase';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect } from 'firebase/auth';
+import firebaseConfig from '../../firebase-applet-config.json';
 
 interface AdminPanelProps {
   onAddNews: (item: Omit<NewsItem, 'id'>) => void;
@@ -243,7 +244,25 @@ export default function AdminPanel({
   const [expressDescAuto, setExpressDescAuto] = useState('🔥 ATENÇÃO! Novos SPOILERS oficiais enviados pela própria equipe do PK XD em primeira mão! Confira os detalhes da nova atualização que está por vir:');
 
   // Gmail integration states
-  const [gmailToken, setGmailToken] = useState<string | null>(null);
+  const [gmailToken, setGmailTokenState] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem('pkxd_gmail_token') || null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  const setGmailToken = (token: string | null) => {
+    setGmailTokenState(token);
+    try {
+      if (token) {
+        localStorage.setItem('pkxd_gmail_token', token);
+      } else {
+        localStorage.removeItem('pkxd_gmail_token');
+      }
+    } catch (e) {}
+  };
+
   const [gmailEmails, setGmailEmails] = useState<any[]>([]);
   const [isGmailLoading, setIsGmailLoading] = useState(false);
   const [gmailQuery, setGmailQuery] = useState('subject:(spoiler OR PK XD OR news OR novidade OR vazamento)');
@@ -521,6 +540,29 @@ export default function AdminPanel({
       
       setGmailError(customErr);
     } finally {
+      setIsGmailLoading(false);
+    }
+  };
+
+  const connectGmailRedirect = async () => {
+    try {
+      setIsGmailLoading(true);
+      setGmailError(null);
+      
+      const provider = new GoogleAuthProvider();
+      provider.addScope('https://www.googleapis.com/auth/gmail.readonly');
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      });
+      
+      try {
+        localStorage.setItem('pending_gmail_connect', 'true');
+      } catch (e) {}
+      
+      await signInWithRedirect(auth, provider);
+    } catch (err: any) {
+      console.error('Error connecting to Gmail via redirect:', err);
+      setGmailError(err.message || 'Falha ao conectar com o Gmail por redirecionamento.');
       setIsGmailLoading(false);
     }
   };
@@ -1426,19 +1468,26 @@ export default function AdminPanel({
                       </button>
                     </div>
                   ) : (
-                    <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 text-right">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 text-right w-full sm:w-auto">
                       <button
                         onClick={() => { setShowLocalImport(!showLocalImport); playTapSound(); }}
-                        className="px-3.5 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white rounded-xl text-xs font-black uppercase transition-all flex items-center justify-center gap-2 cursor-pointer shadow border border-zinc-700 shrink-0 active:scale-95"
+                        className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white rounded-xl text-xs font-black uppercase transition-all flex items-center justify-center gap-2 cursor-pointer shadow border border-zinc-700 shrink-0 active:scale-95"
                       >
-                        📥 Importar Sem Login/Senha (Copiar & Colar)
+                        📥 Copiar & Colar
                       </button>
 
                       <button
                         onClick={connectGmail}
-                        className="px-4 py-2 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white rounded-xl text-xs font-black uppercase transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95 border-0 hover:shadow-red-600/20 hover:shadow-xl shrink-0"
+                        className="px-3 py-2 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white rounded-xl text-xs font-black uppercase transition-all flex items-center justify-center gap-2 cursor-pointer shadow active:scale-95 border-0 hover:shadow-red-600/10 shrink-0"
                       >
-                        🔌 Login Google/Gmail
+                        🔌 Gmail (Popup)
+                      </button>
+
+                      <button
+                        onClick={connectGmailRedirect}
+                        className="px-3 py-2 bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 text-white rounded-xl text-xs font-black uppercase transition-all flex items-center justify-center gap-2 cursor-pointer shadow active:scale-95 border-0 hover:shadow-pink-600/10 shrink-0"
+                      >
+                        📱 Gmail (Redirect)
                       </button>
                     </div>
                   )}
@@ -1528,17 +1577,17 @@ export default function AdminPanel({
                             ⚠️ "ACESSO BLOQUEADO" ou "POPUP FECHADO" NO LOGIN?
                           </h5>
                           <p className="text-[11px] text-gray-300 mt-1 leading-relaxed">
-                            O Gmail é altamento protegido pelo Google. Para permitir a conexão do e-mail <strong>eukoosh@gmail.com</strong> ou <strong>kawanyuri35@gmail.com</strong> no app privado <code>plasma-transmitter-gq7jp.firebaseapp.com</code>, siga as instruções abaixo:
+                            O Gmail é altamente protegido pelo Google. Para permitir a conexão do e-mail <strong>eukoosh@gmail.com</strong> ou <strong>kawanyuri35@gmail.com</strong> no seu app privado <code>{(firebaseConfig as any)?.authDomain || `${(firebaseConfig as any)?.projectId || 'pkxd-e817c'}.firebaseapp.com`}</code>, siga as instruções abaixo:
                           </p>
                         </div>
                       </div>
 
-                      <div className="bg-black/40 border border-white/5 p-3 rounded-xl space-y-2 text-[10.5px] font-sans text-gray-300 leading-relaxed max-h-[180px] overflow-y-auto">
+                      <div className="bg-black/40 border border-white/5 p-3 rounded-xl space-y-2 text-[10.5px] font-sans text-gray-300 leading-relaxed max-h-[180px] overflow-y-auto font-sans">
                         <p>
                           <strong className="text-pink-400">Passo 1:</strong> Acesse o console do Google Cloud: <a href="https://console.cloud.google.com" target="_blank" rel="noreferrer" className="text-cyan-400 underline font-semibold hover:text-cyan-300">console.cloud.google.com</a> logado na mesma conta administradora do Firebase.
                         </p>
                         <p>
-                          <strong className="text-pink-400">Passo 2:</strong> No menu superior (ao lado do logo do Google Cloud), clique no <strong className="text-white">Seletor de Projetos</strong> e certifique-se de abrir o projeto correto do seu app (ex: <code>plasma-transmitter-gq7jp</code>).
+                          <strong className="text-pink-400">Passo 2:</strong> No menu superior (ao lado do logo do Google Cloud), clique no <strong className="text-white">Seletor de Projetos</strong> e certifique-se de abrir o projeto correto do seu app (ex: <code>{(firebaseConfig as any)?.projectId || 'pkxd-e817c'}</code>).
                         </p>
                         <p>
                           <strong className="text-pink-400">Passo 3:</strong> Abra o menu de navegação ☰ e vá em <strong className="text-emerald-400">APIs e Serviços</strong> &gt; <strong className="text-emerald-400">Tela de consentimento OAuth</strong>.
@@ -1569,12 +1618,12 @@ export default function AdminPanel({
                         </div>
                       </div>
 
-                      <div className="bg-black/40 border border-white/5 p-3 rounded-xl space-y-2 text-[10.5px] font-sans text-gray-300 leading-relaxed">
+                      <div className="bg-black/40 border border-white/5 p-3 rounded-xl space-y-2 text-[10.5px] font-sans text-gray-300 leading-relaxed font-sans">
                         <p>
                           <strong className="text-indigo-400">Passo 1:</strong> Abra o console do Firebase em: <a href="https://console.firebase.google.com" target="_blank" rel="noreferrer" className="text-cyan-400 underline font-semibold hover:text-cyan-300">console.firebase.google.com</a>.
                         </p>
                         <p>
-                          <strong className="text-indigo-400">Passo 2:</strong> Clique no seu projeto <strong>plasma-transmitter-gq7jp</strong>.
+                          <strong className="text-indigo-400">Passo 2:</strong> Clique no seu projeto <strong>{(firebaseConfig as any)?.projectId || 'pkxd-e817c'}</strong>.
                         </p>
                         <p>
                           <strong className="text-indigo-400">Passo 3:</strong> No menu lateral esquerdo, acesse <strong className="text-emerald-400">Compilação (Build)</strong> &gt; <strong className="text-emerald-400">Authentication</strong>.
