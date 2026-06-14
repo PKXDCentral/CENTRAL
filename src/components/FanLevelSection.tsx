@@ -26,6 +26,7 @@ interface FanLevelSectionProps {
   onLogout?: () => void;
   onEmailLogin?: (email: string, pass: string) => void;
   onEmailRegister?: (email: string, pass: string, nickname: string) => void;
+  authError?: string | null;
 }
 
 interface RankedPlayer {
@@ -46,7 +47,8 @@ export default function FanLevelSection({
   onLoginRedirect,
   onLogout,
   onEmailLogin,
-  onEmailRegister
+  onEmailRegister,
+  authError: outerAuthError
 }: FanLevelSectionProps) {
   // XP tracker
   const [xp, setXp] = useState(() => {
@@ -523,9 +525,9 @@ export default function FanLevelSection({
                   )}
                 </div>
 
-                {authError && (
-                  <p className="text-[11px] text-red-400 bg-red-950/20 border border-red-500/10 p-2 rounded-xl">
-                    ⚠️ {authError}
+                {(authError || outerAuthError) && (
+                  <p className="text-[11px] text-red-400 bg-red-950/20 border border-red-500/10 p-2.5 rounded-xl whitespace-pre-line leading-relaxed font-sans">
+                    ⚠️ {authError || outerAuthError}
                   </p>
                 )}
               </div>

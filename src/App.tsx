@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { INITIAL_NEWS } from './components/initialNews';
 import { NewsItem, FeaturedVideo, Theory, ShortItem, PastSpoiler, AppNotification } from './types';
 import CountdownWidget from './components/CountdownWidget';
@@ -198,6 +198,10 @@ export default function App() {
   // Fullscreen spoiler overlay state
   const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
   const [fullscreenData, setFullscreenData] = useState<{title: string, desc: string, imageUrl?: string} | null>(null);
+
+  // Session tracking to avoid clock drift issues on real-time notifications
+  const initialNotifIdsRef = useRef<Set<string>>(new Set());
+  const isFirstLoadRef = useRef(true);
 
   // Sync auth state
   useEffect(() => {
@@ -416,31 +420,47 @@ export default function App() {
       list.sort((a, b) => b.createdAt - a.createdAt);
       setNotificationList(list);
 
-      // Trigger automatic high-contrast alert toast only if new notification is very recent of the last 15 seconds
-      if (list.length > 0) {
-        const latest = list[0];
-        const ageInMs = Date.now() - latest.createdAt;
-        if (ageInMs < 15000) {
-          triggerAudio('success');
-          // Let's set the message text
-          setNotifMessage(`📢 ${latest.title.toUpperCase()}: ${latest.body}`);
+      if (isFirstLoadRef.current) {
+        // Collect existing notification IDs to prevent alerting on page load
+        snapshot.forEach(doc => {
+          initialNotifIdsRef.current.add(doc.id);
+        });
+        isFirstLoadRef.current = false;
+        return;
+      }
 
-          // Trigger native system notification if allowed on mobile or computer browsers
-          if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-            try {
-              new Notification(latest.title, {
-                body: latest.body,
-                tag: latest.id,
-                icon: 'https://img.icons8.com/color/96/000000/bell.png'
-              });
-            } catch (err) {
-              console.warn("Could not dispatch native browser notification:", err);
-            }
-          }
-
-          // Auto clear after 8 seconds
-          setTimeout(() => setNotifMessage(null), 8000);
+      // Check for newly added items since page subscription started
+      let newNotif: AppNotification | null = null;
+      for (const item of list) {
+        if (!initialNotifIdsRef.current.has(item.id)) {
+          // It's a new notification! Let's alert.
+          newNotif = item;
+          // Add to seen set so we don't alert again
+          initialNotifIdsRef.current.add(item.id);
+          break; // alert only the most recent new one
         }
+      }
+
+      if (newNotif) {
+        triggerAudio('success');
+        // Let's set the message text
+        setNotifMessage(`📢 ${newNotif.title.toUpperCase()}: ${newNotif.body}`);
+
+        // Trigger native system notification if allowed on mobile or computer browsers
+        if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+          try {
+            new Notification(newNotif.title, {
+              body: newNotif.body,
+              tag: newNotif.id,
+              icon: 'https://img.icons8.com/color/96/000000/bell.png'
+            });
+          } catch (err) {
+            console.warn("Could not dispatch native browser notification:", err);
+          }
+        }
+
+        // Auto clear after 8 seconds
+        setTimeout(() => setNotifMessage(null), 8000);
       }
     }, (error) => {
       console.warn("Could not fetch notifications:", error);
@@ -1719,8 +1739,8 @@ export default function App() {
 
                         {adminAuthTab === 'pin' && (
                           <div className="bg-zinc-950/60 p-5 rounded-2xl border border-white/5 space-y-3 max-w-md mx-auto text-left">
-                            <p className="text-zinc-400 text-[11px] font-sans">
-                              ⚠️ <strong>Nota sobre o modo PIN:</strong> Ao usar o Código PIN, você consegue ver o painel, mas os posts adicionados não sobem na nuvem real por restrições do Firebase FireStore. Use o método por <strong>E-mail & Senha</strong> ou <strong>Google</strong> do seu administrador para sincronização total!
+                            <p className="text-zinc-350 text-[11px] font-sans">
+                              ✅ <strong>Modo PIN Sincronizado:</strong> O login por PIN de backup agora <strong>suporta sincronização total na nuvem real</strong>. Posts e configurações que você criar aqui atualizarão instantaneamente em tempo real para os outros aparelhos! 🚀
                             </p>
                             <div className="flex gap-2 pt-1">
                               <input
@@ -1847,6 +1867,7 @@ export default function App() {
             onLogout={handleLogout}
             onEmailLogin={handleEmailLogin}
             onEmailRegister={handleEmailRegister}
+            authError={googleAuthError}
           />
         </div>
 
