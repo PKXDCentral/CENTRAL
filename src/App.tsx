@@ -349,39 +349,58 @@ export default function App() {
       if (snapshot.exists()) {
         const data = snapshot.data();
         
-        // Use default if undefined/null/empty string to avoid getting stuck in a falsy stale local state
-        const titleVal = (data.spoilerTitle !== undefined && data.spoilerTitle !== null) ? data.spoilerTitle : defaultTitle;
-        setSpoilerTitle(titleVal);
-        localStorage.setItem('pkxd_spoiler_title', titleVal);
+        // Safeguard partial updates: only alter local states when those specific fields are present in the snapshot
+        if (data.spoilerTitle !== undefined && data.spoilerTitle !== null) {
+          setSpoilerTitle(data.spoilerTitle);
+          localStorage.setItem('pkxd_spoiler_title', data.spoilerTitle);
+        }
 
-        const descVal = (data.spoilerDesc !== undefined && data.spoilerDesc !== null) ? data.spoilerDesc : defaultDesc;
-        setSpoilerDesc(descVal);
-        localStorage.setItem('pkxd_spoiler_desc', descVal);
+        if (data.spoilerDesc !== undefined && data.spoilerDesc !== null) {
+          setSpoilerDesc(data.spoilerDesc);
+          localStorage.setItem('pkxd_spoiler_desc', data.spoilerDesc);
+        }
 
-        const imgVal = (data.spoilerImageUrl !== undefined && data.spoilerImageUrl !== null) ? data.spoilerImageUrl : '';
-        setSpoilerImage(imgVal);
-        localStorage.setItem('pkxd_spoiler_image', imgVal);
+        if (data.spoilerImageUrl !== undefined && data.spoilerImageUrl !== null) {
+          setSpoilerImage(data.spoilerImageUrl);
+          localStorage.setItem('pkxd_spoiler_image', data.spoilerImageUrl);
+        }
 
-        const logoVal = data.logoUrl !== undefined ? data.logoUrl : '';
-        setSiteLogoUrl(logoVal);
-        localStorage.setItem('pkxd_site_logo_url', logoVal);
+        if (data.logoUrl !== undefined && data.logoUrl !== null) {
+          setSiteLogoUrl(data.logoUrl);
+          localStorage.setItem('pkxd_site_logo_url', data.logoUrl);
+        }
 
-        const forceVal = data.forceReveal !== undefined ? data.forceReveal : false;
-        setForceReveal(forceVal);
-        localStorage.setItem('pkxd_force_reveal', forceVal ? 'true' : 'false');
+        if (data.forceReveal !== undefined && data.forceReveal !== null) {
+          const forceVal = data.forceReveal;
+          setForceReveal(forceVal);
+          localStorage.setItem('pkxd_force_reveal', forceVal ? 'true' : 'false');
+        }
 
-        const revealedVal = data.revealedAt !== undefined ? data.revealedAt : 0;
-        setRevealedAt(revealedVal);
-        localStorage.setItem('pkxd_spoiler_revealed_at', String(revealedVal));
+        if (data.revealedAt !== undefined && data.revealedAt !== null) {
+          const revealedVal = data.revealedAt;
+          setRevealedAt(revealedVal);
+          localStorage.setItem('pkxd_spoiler_revealed_at', String(revealedVal));
+        }
 
-        // Extra/Alternative Countdown
-        setExtraCountdownTitle(data.extraCountdownTitle !== undefined ? data.extraCountdownTitle : '');
-        setExtraCountdownDate(data.extraCountdownDate !== undefined ? data.extraCountdownDate : '');
-        setExtraCountdownEnabled(data.extraCountdownEnabled !== undefined ? data.extraCountdownEnabled : false);
+        if (data.extraCountdownTitle !== undefined && data.extraCountdownTitle !== null) {
+          setExtraCountdownTitle(data.extraCountdownTitle);
+        }
 
-        // Delayed Alerts
-        setIsDelayed(data.isDelayed !== undefined ? data.isDelayed : false);
-        setDelayMessage(data.delayMessage !== undefined ? data.delayMessage : '');
+        if (data.extraCountdownDate !== undefined && data.extraCountdownDate !== null) {
+          setExtraCountdownDate(data.extraCountdownDate);
+        }
+
+        if (data.extraCountdownEnabled !== undefined && data.extraCountdownEnabled !== null) {
+          setExtraCountdownEnabled(data.extraCountdownEnabled);
+        }
+
+        if (data.isDelayed !== undefined && data.isDelayed !== null) {
+          setIsDelayed(data.isDelayed);
+        }
+
+        if (data.delayMessage !== undefined && data.delayMessage !== null) {
+          setDelayMessage(data.delayMessage);
+        }
       } else {
         // Document does not exist or has been deleted - fallback to defaults immediately
         setSpoilerTitle(defaultTitle);
