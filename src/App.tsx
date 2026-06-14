@@ -1511,17 +1511,17 @@ export default function App() {
               <div className="space-y-4 text-left">
                 {/* Admin Welcome Badge */}
                 {user?.uid === 'admin_fallback' ? (
-                  <div className="bg-amber-500/10 border-2 border-amber-500/30 p-4 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 text-left shadow-lg">
+                  <div className="bg-emerald-500/10 border-2 border-emerald-500/30 p-4 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 text-left shadow-lg">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-black animate-pulse">
+                      <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black animate-pulse">
                         PIN
                       </div>
                       <div>
-                        <h4 className="font-sans font-black text-amber-400 text-sm sm:text-base uppercase tracking-wide flex items-center gap-1.5">
-                          ⚠️ MODO PIN LOCAL ATIVO (SEM GRAVAÇÃO NUVEM)
+                        <h4 className="font-sans font-black text-emerald-400 text-sm sm:text-base uppercase tracking-wide flex items-center gap-1.5">
+                          ⚡ PORTAL ADMIN SINCRONIZADO (MODO PIN)
                         </h4>
-                        <p className="font-sans text-[11px] text-zinc-305 leading-normal max-w-2xl">
-                          Você entrou com o Código de Segurança. Para o database salvar suas novidades e aparecer para outros fãs, por favor faça login via Google no painel de Entrar abaixo!
+                        <p className="font-sans text-[11px] text-zinc-300 leading-normal max-w-2xl">
+                          Você acessou usando o Código PIN de emergência. Seus posts, códigos de vídeos e spoilers criados aqui <strong>são sincronizados e gravados na nuvem do Firestore em tempo real</strong> para todos os jogadores do PK XD! 🚀
                         </p>
                       </div>
                     </div>
