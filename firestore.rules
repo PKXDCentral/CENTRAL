@@ -14,12 +14,12 @@ service cloud.firestore {
 
     function isAdmin() {
       return (request.auth != null && request.auth.token != null && (request.auth.token.email == "kawanyuri35@gmail.com" || request.auth.token.email == "eukoosh@gmail.com"))
-             || (request.resource != null && request.resource.data != null && request.resource.data.get('admin_secret', '') == "pkxd2026_super_secret_admin_key");
+             || (request.resource != null && request.resource.data != null && 'admin_secret' in request.resource.data && request.resource.data.admin_secret == "pkxd2026_super_secret_admin_key");
     }
 
     function isDeletable() {
       return (request.auth != null && request.auth.token != null && (request.auth.token.email == "kawanyuri35@gmail.com" || request.auth.token.email == "eukoosh@gmail.com"))
-             || (resource != null && resource.data != null && resource.data.get('admin_secret', '') == "pkxd2026_super_secret_admin_key");
+             || (resource != null && resource.data != null && 'admin_secret' in resource.data && resource.data.admin_secret == "pkxd2026_super_secret_admin_key");
     }
 
     // News rules
@@ -84,7 +84,7 @@ service cloud.firestore {
     match /leaderboard/{playerId} {
       allow read: if true;
       allow create, update: if (isSignedIn() && request.auth.uid == playerId)
-                               || (request.resource != null && request.resource.data != null && request.resource.data.get('admin_secret', '') == "pkxd2026_super_secret_admin_key");
+                               || (request.resource != null && request.resource.data != null && 'admin_secret' in request.resource.data && request.resource.data.admin_secret == "pkxd2026_super_secret_admin_key");
       allow delete: if isDeletable();
     }
   }
