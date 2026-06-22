@@ -164,7 +164,7 @@ export default function App() {
   const [googleAuthError, setGoogleAuthError] = useState<string | null>(null);
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
-  const [adminAuthTab, setAdminAuthTab] = useState<'email' | 'google' | 'pin'>('email');
+  const [adminAuthTab, setAdminAuthTab] = useState<'email' | 'google' | 'pin'>('pin');
 
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [fanLevel, setFanLevel] = useState(() => {
