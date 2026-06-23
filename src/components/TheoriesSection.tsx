@@ -34,7 +34,7 @@ export default function TheoriesSection({ theories, isAdmin, onLike, onDelete, o
     localStorage.setItem('pkxd_liked_theories', JSON.stringify(updated));
     onLike(id);
     playSuccessSound();
-    onAddXP(10, 'Apoio a Teoria 🔮');
+    onAddXP(80, 'Apoio a Teoria 🔮');
   };
 
   return (

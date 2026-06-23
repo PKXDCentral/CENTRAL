@@ -1389,9 +1389,19 @@ export default function App() {
     setNotifMessage(`+${amount} XP ganho: ${reason}! ⚡`);
     setTimeout(() => setNotifMessage(null), 4000);
 
-    if (nextXp >= 100) {
-      nextXp = nextXp - 100;
-      handleLevelUpCallback();
+    let levelsGained = 0;
+    while (nextXp >= 100) {
+      nextXp -= 100;
+      levelsGained++;
+    }
+
+    if (levelsGained > 0) {
+      const finalLevel = fanLevel + levelsGained;
+      setFanLevel(finalLevel);
+      localStorage.setItem('pkxd_fan_level', finalLevel.toString());
+      triggerAudio('levelUp');
+      setNotifMessage(`LEVEL UP x${levelsGained}! Você subiu para o Nível de Fã ${finalLevel}! 🌟`);
+      setTimeout(() => setNotifMessage(null), 4000);
     } else {
       triggerAudio('success');
     }
@@ -1418,7 +1428,7 @@ export default function App() {
       }, { merge: true });
 
       // Add XP for rating
-      handleAddFanXP(15, 'Avaliação de Spoiler 🔮');
+      handleAddFanXP(150, 'Avaliação de Spoiler 🔮');
     } catch (err: any) {
       console.warn("Erro ao registrar avaliação base:", err);
       handleFirestoreError(err, OperationType.WRITE, 'past_spoilers');
@@ -1443,7 +1453,7 @@ export default function App() {
         reactions: updatedReactions
       }, { merge: true });
 
-      handleAddFanXP(5, `Reação ${emoji} a Spoiler 🔮`);
+      handleAddFanXP(50, `Reação ${emoji} a Spoiler 🔮`);
     } catch (err: any) {
       console.warn("Erro ao registrar reação ao spoiler:", err);
       handleFirestoreError(err, OperationType.WRITE, 'past_spoilers');

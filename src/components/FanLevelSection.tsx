@@ -193,12 +193,12 @@ export default function FanLevelSection({
 
     setTimeout(() => {
       const rewards = [
-        { amount: 15, text: "⭐ Super Sorte" },
-        { amount: 25, text: "🔥 Brilho de Fogo" },
-        { amount: 10, text: "⚡ Gíria Cósmica" },
-        { amount: 30, text: "👑 Baú Lendário!" },
-        { amount: 15, text: "🔮 Orbe Divino" },
-        { amount: 20, text: "🛸 Nave do Admin" }
+        { amount: 150, text: "⭐ Super Sorte" },
+        { amount: 250, text: "🔥 Brilho de Fogo" },
+        { amount: 100, text: "⚡ Gíria Cósmica" },
+        { amount: 300, text: "👑 Baú Lendário!" },
+        { amount: 150, text: "🔮 Orbe Divino" },
+        { amount: 200, text: "🛸 Nave do Admin" }
       ];
       const selected = rewards[Math.floor(Math.random() * rewards.length)];
       setWheelResult({ amount: selected.amount, message: selected.text });
@@ -255,12 +255,12 @@ export default function FanLevelSection({
       if (soundEnabled) playSuccessSound();
 
       const standardLoot = [
-        { amount: 15, name: "⚡ Super Gema Verde", rarity: "Raro" },
-        { amount: 20, name: "🛸 Turbina de Gravidade Zero", rarity: "Épico" },
-        { amount: 25, name: "🕶️ Óculos Retro-Tech do Admin", rarity: "Lendário" },
-        { amount: 15, name: "🎒 Mochila Foguete de Neon", rarity: "Raro" },
-        { amount: 30, name: "⭐ Armadura Suprema PK XD", rarity: "Lendário" },
-        { amount: 20, name: "🐲 Drone Companheiro Fantasma", rarity: "Épico" }
+        { amount: 150, name: "⚡ Super Gema Verde", rarity: "Raro" },
+        { amount: 200, name: "🛸 Turbina de Gravidade Zero", rarity: "Épico" },
+        { amount: 250, name: "🕶️ Óculos Retro-Tech do Admin", rarity: "Lendário" },
+        { amount: 150, name: "🎒 Mochila Foguete de Neon", rarity: "Raro" },
+        { amount: 300, name: "⭐ Armadura Suprema PK XD", rarity: "Lendário" },
+        { amount: 200, name: "🐲 Drone Companheiro Fantasma", rarity: "Épico" }
       ];
       const selected = standardLoot[Math.floor(Math.random() * standardLoot.length)];
       setChestReward(selected);
@@ -519,7 +519,7 @@ export default function FanLevelSection({
     const newStreak = fireStreak + 1;
     setFireStreak(newStreak);
 
-    addXP(50, "Coleta Diária 🔥 +1 FOGUINHO!");
+    addXP(500, "Coleta Diária 🔥 +1 FOGUINHO!");
   };
 
   const handleDeletePlayer = async (playerId: string, playerName: string) => {
@@ -1042,7 +1042,7 @@ export default function FanLevelSection({
                 {hasClaimedDaily ? (
                   <div className="w-full bg-emerald-500/10 border border-emerald-500/20 p-2.5 rounded-xl flex items-center gap-2 text-emerald-400 text-[10px] font-black uppercase text-center justify-center">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Colete diário garantido! (+50 XP) 🔥</span>
+                    <span>Colete diário garantido! (+500 XP) 🔥</span>
                   </div>
                 ) : (
                   <button
@@ -1051,7 +1051,7 @@ export default function FanLevelSection({
                     className="w-full py-3 bg-gradient-to-r from-orange-500 via-red-500 to-amber-500 hover:brightness-110 text-black font-sans font-black text-xs uppercase tracking-wider rounded-xl border-b-4 border-red-800 active:border-b-0 cursor-pointer shadow-[0_4px_15px_rgba(234,88,12,0.25)] active:translate-y-1 transition-all text-center flex items-center justify-center gap-2"
                   >
                     <Flame className="w-3.5 h-3.5 fill-black text-black animate-pulse" />
-                    <span>Coletar XP Diário (+50 XP)</span>
+                    <span>Coletar XP Diário (+500 XP)</span>
                   </button>
                 )}
               </div>

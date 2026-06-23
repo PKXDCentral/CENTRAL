@@ -35,9 +35,9 @@ export default function WhatsAppPromo({ channelUrl, onAddXP }: WhatsAppPromoProp
   const handleJoinClick = () => {
     playLevelUpSound();
     
-    // Award 25 XP if not already claimed
+    // Award 250 XP if not already claimed
     if (!xpClaimed && onAddXP) {
-      onAddXP(25, 'Comunidade WhatsApp 🟢');
+      onAddXP(250, 'Comunidade WhatsApp 🟢');
       setXpClaimed(true);
       try {
         localStorage.setItem('pkxd_whatsapp_xp_claimed', 'true');
@@ -177,7 +177,7 @@ export default function WhatsAppPromo({ channelUrl, onAddXP }: WhatsAppPromoProp
                 </button>
                 {/* Floating Badge */}
                 <div className="absolute -top-2.5 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-black text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow-md whitespace-nowrap border border-black/10">
-                  {xpClaimed ? "✓ +25 XP Coletado" : "⚡ +25 XP Grátis!"}
+                  {xpClaimed ? "✓ +250 XP Coletado" : "⚡ +250 XP Grátis!"}
                 </div>
               </div>
 
