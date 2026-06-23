@@ -460,7 +460,7 @@ export default function FanLevelSection({
   };
 
   return (
-    <section id="fan-level-dashboard" className="bg-zinc-900 border border-white/5 rounded-3xl p-6 sm:p-8 space-y-8 text-left relative overflow-hidden">
+    <section id="fan-level-dashboard" className="bg-zinc-900 border border-white/5 rounded-3xl p-6 sm:p-8 space-y-8 text-left relative overflow-hidden transform-gpu">
 
       {/* Dynamic Gaining Alert Alert */}
       {notif && (
@@ -486,7 +486,7 @@ export default function FanLevelSection({
         </div>
 
         {/* Current User Quick Stats Widget */}
-        <div className="bg-black/40 p-4 rounded-2xl border border-white/5 w-full lg:w-96 flex items-center justify-between gap-4">
+        <div className="bg-zinc-950 p-4 rounded-2xl border border-white/5 w-full lg:w-96 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             {/* Round status badge */}
             <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-orange-500 to-yellow-400 p-0.5 flex items-center justify-center relative">

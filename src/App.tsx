@@ -305,7 +305,40 @@ export default function App() {
       });
   }, []);
 
-  // Favicon dynamic injection removed as requested by user
+  // Register service worker for mobile notifications support & restore favicon dynamic updates as requested
+  useEffect(() => {
+    let logoIconUrl = siteLogoUrl;
+    if (!logoIconUrl || logoIconUrl.includes("photos.app.goo.gl") || logoIconUrl.includes("google.com/photos")) {
+      logoIconUrl = "./favicon.svg";
+    }
+    
+    if (logoIconUrl) {
+      let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = logoIconUrl;
+      if (logoIconUrl.endsWith('.svg')) {
+        link.setAttribute('type', 'image/svg+xml');
+      } else {
+        link.removeAttribute('type');
+      }
+    }
+  }, [siteLogoUrl]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then((reg) => {
+          console.log('Service Worker registered successfully:', reg.scope);
+        })
+        .catch((err) => {
+          console.error('Service Worker registration failed:', err);
+        });
+    }
+  }, []);
 
   // Realtime Firebase news listener
   useEffect(() => {
@@ -466,14 +499,27 @@ export default function App() {
         // Let's set the message text
         setNotifMessage(`📢 ${newNotif.title.toUpperCase()}: ${newNotif.body}`);
 
-        // Trigger native system notification if allowed on mobile or computer browsers
+        // Trigger native system notification (using service worker wrapper for mobile compatibility!)
         if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
           try {
-            new Notification(newNotif.title, {
+            const notifTitle = newNotif.title;
+            const notifOptions = {
               body: newNotif.body,
               tag: newNotif.id,
-              icon: 'https://img.icons8.com/color/96/000000/bell.png'
-            });
+              icon: 'https://img.icons8.com/color/96/000000/bell.png',
+              badge: '/favicon.svg',
+              vibrate: [100, 50, 100]
+            };
+
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.ready.then((reg) => {
+                reg.showNotification(notifTitle, notifOptions);
+              }).catch(() => {
+                new Notification(notifTitle, notifOptions);
+              });
+            } else {
+              new Notification(notifTitle, notifOptions);
+            }
           } catch (err) {
             console.warn("Could not dispatch native browser notification:", err);
           }
@@ -2357,9 +2403,22 @@ export default function App() {
                       setHasNotificationPermission(perm === 'granted');
                       if (perm === 'granted') {
                         triggerAudio('success');
-                        new Notification('Portal PKXD Hub 🔔', {
+                        const welcomeTitle = 'Portal PKXD Hub 🔔';
+                        const welcomeOptions = {
                           body: 'Notificações ativas com sucesso! Você receberá alertas de novos spoilers e códigos.',
-                        });
+                          icon: '/favicon.svg',
+                          badge: '/favicon.svg',
+                        };
+
+                        if ('serviceWorker' in navigator) {
+                          navigator.serviceWorker.ready.then((reg) => {
+                            reg.showNotification(welcomeTitle, welcomeOptions);
+                          }).catch(() => {
+                            new Notification(welcomeTitle, welcomeOptions);
+                          });
+                        } else {
+                          new Notification(welcomeTitle, welcomeOptions);
+                        }
                       }
                     } catch (err) {
                       console.warn(err);
