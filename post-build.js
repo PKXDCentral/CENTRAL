@@ -5,7 +5,13 @@ const distPath = path.join(process.cwd(), 'dist');
 const sourceFile = path.join(distPath, 'inscricoes.html');
 
 if (fs.existsSync(sourceFile)) {
-  const content = fs.readFileSync(sourceFile);
+  const content = fs.readFileSync(sourceFile, 'utf8');
+
+  // Adjust relative paths for files placed in sub-folders (one level deeper)
+  const adjustedContent = content
+    .replace(/(href|src)="\.\/assets\//g, '$1="../assets/')
+    .replace(/(href|src)="assets\//g, '$1="../assets/')
+    .replace(/(href|src)="\.\/favicon\.svg"/g, '$1="../favicon.svg"');
 
   const targets = [
     path.join(distPath, 'inscricoes', 'index.html'),
@@ -18,8 +24,8 @@ if (fs.existsSync(sourceFile)) {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    fs.writeFileSync(target, content);
-    console.log(`Copied inscricoes.html to ${target}`);
+    fs.writeFileSync(target, adjustedContent);
+    console.log(`Copied and adjusted inscricoes.html to ${target}`);
   });
 } else {
   console.warn('Warning: dist/inscricoes.html not found, skipping replication.');
