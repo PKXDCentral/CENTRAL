@@ -194,20 +194,63 @@ export default function App() {
     return 0;
   });
 
-  // Simple robust state-based path router supporting browser navigation and deep linking
+  // Simple robust state-based path router supporting browser navigation and deep linking (pathname + hash + search fallback)
   const [currentPath, setCurrentPath] = useState(() => {
     try {
-      const p = decodeURIComponent(window.location.pathname);
-      return p;
+      const path = decodeURIComponent(window.location.pathname);
+      const hash = decodeURIComponent(window.location.hash);
+      const search = decodeURIComponent(window.location.search);
+      return `${path} ${hash} ${search}`;
     } catch (e) {
-      return window.location.pathname;
+      return `${window.location.pathname} ${window.location.hash} ${window.location.search}`;
     }
   });
 
   const navigateTo = (path: string) => {
     try {
-      window.history.pushState({}, '', path);
-      setCurrentPath(path);
+      const isGitHubPages = window.location.hostname.includes('github.io');
+      let targetPath = path;
+
+      if (isGitHubPages) {
+        // On GitHub Pages, let's preserve the repository prefix subdirectory to prevent global root 404s
+        const segments = window.location.pathname.split('/');
+        const base = segments[1]; // E.g., repo name
+        
+        if (path.toLowerCase().includes('inscric') || path.toLowerCase().includes('inscricao')) {
+          // Use the replicated directory that contains index.html
+          if (base && base !== 'inscricoes' && base !== 'Inscricoes' && base !== 'Inscrições') {
+            targetPath = `/${base}/inscricoes/`;
+          } else {
+            targetPath = `/inscricoes/`;
+          }
+        } else {
+          // Back to main index
+          if (base && base !== 'inscricoes' && base !== 'Inscricoes' && base !== 'Inscrições') {
+            targetPath = `/${base}/`;
+          } else {
+            targetPath = `/`;
+          }
+        }
+      } else {
+        // Standard environments
+        if (path.toLowerCase().includes('inscric') || path.toLowerCase().includes('inscricao')) {
+          targetPath = '/inscricoes/';
+        } else {
+          targetPath = '/';
+        }
+      }
+
+      window.history.pushState({}, '', targetPath);
+      
+      try {
+        const p = decodeURIComponent(window.location.pathname);
+        const h = decodeURIComponent(window.location.hash);
+        const s = decodeURIComponent(window.location.search);
+        setCurrentPath(`${p} ${h} ${s}`);
+      } catch (e) {
+        setCurrentPath(`${window.location.pathname} ${window.location.hash} ${window.location.search}`);
+      }
+
       // scroll to top smoothly
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (e) {
@@ -219,9 +262,11 @@ export default function App() {
     const handlePopState = () => {
       try {
         const p = decodeURIComponent(window.location.pathname);
-        setCurrentPath(p);
+        const h = decodeURIComponent(window.location.hash);
+        const s = decodeURIComponent(window.location.search);
+        setCurrentPath(`${p} ${h} ${s}`);
       } catch (e) {
-        setCurrentPath(window.location.pathname);
+        setCurrentPath(`${window.location.pathname} ${window.location.hash} ${window.location.search}`);
       }
     };
     window.addEventListener('popstate', handlePopState);
