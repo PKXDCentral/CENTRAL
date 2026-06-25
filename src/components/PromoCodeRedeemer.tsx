@@ -63,7 +63,7 @@ export default function PromoCodeRedeemer({ videos, isAdmin, onDeleteVideo, onEd
         <div className="bg-amber-500/10 border border-amber-500/30 p-4 rounded-2xl flex items-start gap-3">
           <Zap className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
           <div className="font-sans text-xs text-gray-300 leading-relaxed">
-            <strong className="text-amber-300">Como funciona o Painel?</strong> Este é o Painel de Destaques do nosso site! Nós divulgamos vídeos e lives enviadas pela comunidade e selecionadas pela moderação. Assista aos conteúdos listados e, se você também quiser aparecer em destaque aqui, envie seu link na nossa página de Inscrições!
+            <strong className="text-amber-300">Como funciona o Painel?</strong> Este é o Painel de Destaques do nosso site, onde publicamos vídeos e transmissões ao vivo com códigos ativos do PK XD! Assista aos conteúdos listados para ficar por dentro dos novos cupons oficiais e resgatar seus prêmios exclusivos!
           </div>
         </div>
 

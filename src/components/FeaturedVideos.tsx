@@ -79,6 +79,14 @@ export default function FeaturedVideos({ videos, isAdmin, onDelete }: FeaturedVi
         </div>
       </div>
 
+      {/* Community submissions notice */}
+      <div className="bg-indigo-950/40 border border-indigo-500/30 p-4 rounded-2xl flex items-start gap-3 relative z-10">
+        <Star className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5 animate-pulse" />
+        <div className="font-sans text-xs text-gray-300 leading-relaxed">
+          <strong className="text-indigo-300">Quer ver seu conteúdo em destaque?</strong> Estes são os vídeos de destaque selecionados a dedo pelo <strong className="text-pink-400">PKXD Central</strong>! Se você é criador de conteúdo e quer que seu vídeo ou transmissão apareça em destaque aqui, faça o envio do seu link através da nossa página de <strong className="text-indigo-300">Inscrições</strong>!
+        </div>
+      </div>
+
       {filtered.length === 0 ? (
         <div className="bg-black/20 border border-dashed border-white/5 p-8 rounded-2xl text-center">
           <Video className="w-8 h-8 text-indigo-400/40 mx-auto mb-2 animate-pulse" />
