@@ -89,11 +89,39 @@ export default function PromoCodeRedeemer({ videos, isAdmin, onDeleteVideo, onEd
                   <div className="bg-zinc-950 p-4.5 rounded-[14px] flex flex-col justify-between h-full space-y-4">
                     
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-[9px] font-mono text-amber-400 font-extrabold uppercase bg-amber-500/15 px-2 py-0.5 rounded-md border border-amber-500/20 flex items-center gap-1">
-                          <Sparkles className="w-2.5 h-2.5 animate-spin" />
-                          <span>CÓDIGO ATIVO</span>
-                        </span>
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className={`text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded-md border flex items-center gap-1 ${
+                            item.date?.includes('Ao Vivo') 
+                              ? 'text-red-400 bg-red-500/15 border-red-500/20 animate-pulse'
+                              : item.date?.includes('Estreia')
+                              ? 'text-purple-400 bg-purple-500/15 border-purple-500/20 font-black'
+                              : item.date?.includes('Agendado') || item.date?.includes('Próxima')
+                              ? 'text-sky-400 bg-sky-500/15 border-sky-500/20'
+                              : 'text-amber-400 bg-amber-500/15 border-amber-500/20'
+                          }`}>
+                            <Sparkles className="w-2.5 h-2.5" />
+                            <span>{item.date || 'CÓDIGO ATIVO'}</span>
+                          </span>
+
+                          {item.scheduledAt && (
+                            <span className="text-[9px] font-mono text-zinc-300 bg-zinc-800/60 px-2 py-0.5 rounded-md border border-white/5 font-bold">
+                              ⏰ {(() => {
+                                try {
+                                  if (item.scheduledAt.includes('T')) {
+                                    const [datePart, timePart] = item.scheduledAt.split('T');
+                                    const [year, month, day] = datePart.split('-');
+                                    const [hour, min] = timePart.split(':');
+                                    return `${day}/${month} às ${hour}:${min}`;
+                                  }
+                                  return item.scheduledAt;
+                                } catch (e) {
+                                  return item.scheduledAt;
+                                }
+                              })()}
+                            </span>
+                          )}
+                        </div>
                         <span className="text-[9px] font-sans text-gray-400 truncate max-w-[120px]">
                           Por: <strong className="text-gray-300">@{item.author.replace('@', '')}</strong>
                         </span>

@@ -25,6 +25,27 @@ function getPlainSnippet(text: string): string {
   return clean;
 }
 
+// Utility to extract the first image URL from description (markdown, HTML or raw URL)
+function getFirstImageFromDescription(text: string): string | null {
+  if (!text) return null;
+  // Match Markdown Image: ![alt](url)
+  const mdMatched = text.match(/!\[.*?\]\((.*?)\)/i);
+  if (mdMatched && mdMatched[1]) {
+    return mdMatched[1];
+  }
+  // Match HTML Image src: <img src="url">
+  const htmlMatched = text.match(/<img\s+[^>]*src=["']([^"']+)["'][^>]*>/i);
+  if (htmlMatched && htmlMatched[1]) {
+    return htmlMatched[1];
+  }
+  // Match raw image URLs
+  const rawMatched = text.match(/https?:\/\/[^\s]+?(?:\.png|\.jpg|\.jpeg|\.gif|\.webp|\.bmp)(?:\?[^\s]*)?/i);
+  if (rawMatched && rawMatched[0]) {
+    return rawMatched[0];
+  }
+  return null;
+}
+
 // Custom parser to split paragraphs, lists, headers, and media links in order
 function renderRichContent(text: string) {
   if (!text) return null;
@@ -281,6 +302,7 @@ export default function PastSpoilersSection({ spoilers, isAdmin, onDelete, onEdi
           });
 
           const snippet = getPlainSnippet(spoil.description);
+          const firstImgUrl = getFirstImageFromDescription(spoil.description) || spoil.imageUrl;
           const avgRating = spoil.ratingCount && spoil.ratingCount > 0 
             ? (spoil.ratingSum || 0) / spoil.ratingCount 
             : null;
@@ -293,9 +315,9 @@ export default function PastSpoilersSection({ spoilers, isAdmin, onDelete, onEdi
             >
               {/* Card Image */}
               <div className="h-32 w-full overflow-hidden relative bg-black/40 border-b border-zinc-800/60">
-                {spoil.imageUrl ? (
+                {firstImgUrl ? (
                   <img 
-                    src={spoil.imageUrl} 
+                    src={firstImgUrl} 
                     alt={spoil.title} 
                     className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" 
                     referrerPolicy="no-referrer"

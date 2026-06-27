@@ -35,6 +35,27 @@ function parseBoldText(inputText: string): React.ReactNode {
   });
 }
 
+// Utility to extract the first image URL from description (markdown, HTML or raw URL)
+function getFirstImageFromDescription(text: string): string | null {
+  if (!text) return null;
+  // Match Markdown Image: ![alt](url)
+  const mdMatched = text.match(/!\[.*?\]\((.*?)\)/i);
+  if (mdMatched && mdMatched[1]) {
+    return mdMatched[1];
+  }
+  // Match HTML Image src: <img src="url">
+  const htmlMatched = text.match(/<img\s+[^>]*src=["']([^"']+)["'][^>]*>/i);
+  if (htmlMatched && htmlMatched[1]) {
+    return htmlMatched[1];
+  }
+  // Match raw image URLs
+  const rawMatched = text.match(/https?:\/\/[^\s]+?(?:\.png|\.jpg|\.jpeg|\.gif|\.webp|\.bmp)(?:\?[^\s]*)?/i);
+  if (rawMatched && rawMatched[0]) {
+    return rawMatched[0];
+  }
+  return null;
+}
+
 // Custom parser to split paragraphs, lists, headers, and media links in order
 function parseAndRenderContent(text: string) {
   if (!text) return null;
@@ -340,6 +361,8 @@ export default function CountdownWidget({
     playTapSound();
   };
 
+  const activeImageUrl = getFirstImageFromDescription(spoilerDesc) || spoilerImageUrl;
+
   return (
     <div 
       id="countdown-container"
@@ -409,7 +432,7 @@ export default function CountdownWidget({
                     onClick={(e) => {
                       e.stopPropagation();
                       playTapSound();
-                      onOpenFullscreen(spoilerTitle || 'Nova Atualização Incrível!', spoilerDesc, spoilerImageUrl);
+                      onOpenFullscreen(spoilerTitle || 'Nova Atualização Incrível!', spoilerDesc, activeImageUrl);
                     }}
                     className="flex-shrink-0 px-4 py-2 bg-gradient-to-r from-pink-500 to-violet-600 hover:from-pink-600 hover:to-violet-700 text-white font-sans font-black uppercase text-[10px] tracking-wider rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:scale-105 active:scale-95 transition-all duration-150 border-0"
                   >
@@ -419,10 +442,10 @@ export default function CountdownWidget({
               </div>
 
               {/* CRISP AND CLEAR IMAGE DIRECT ENTRY */}
-              {spoilerImageUrl ? (
+              {activeImageUrl ? (
                 <div className="relative w-full overflow-hidden rounded-2xl border-2 border-white/10 bg-black/50 shadow-inner flex items-center justify-center p-2">
                   <img 
-                    src={spoilerImageUrl} 
+                    src={activeImageUrl} 
                     alt="Imagem Revelada do Spoiler" 
                     className="w-full max-h-[450px] object-contain rounded-xl hover:scale-[1.01] transition-transform duration-300 mx-auto"
                     referrerPolicy="no-referrer"

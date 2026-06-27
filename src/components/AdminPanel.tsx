@@ -220,6 +220,7 @@ export default function AdminPanel({
   const [excerpt, setExcerpt] = useState('');
   const [content, setContent] = useState('');
   const [videoStatus, setVideoStatus] = useState('Ao Vivo 🔴');
+  const [scheduledTime, setScheduledTime] = useState('');
   
   // Custom spoiler state
   const [spoilerTitle, setSpoilerTitle] = useState(activeSpoilerTitle);
@@ -853,6 +854,7 @@ export default function AdminPanel({
       setExcerpt(newsToEdit.excerpt);
       setContent(newsToEdit.content);
       setVideoStatus(newsToEdit.date || 'Ao Vivo 🔴');
+      setScheduledTime(newsToEdit.scheduledAt || '');
       setActiveTab('news');
       setIsOpen(true);
     }
@@ -1246,7 +1248,8 @@ export default function AdminPanel({
         author: author || 'Criador Oficial',
         excerpt,
         content,
-        date: videoStatus
+        date: videoStatus,
+        scheduledAt: scheduledTime
       };
       onSaveEdit(updated);
       showStatus('Vídeo de código atualizado! ⚡');
@@ -1258,7 +1261,8 @@ export default function AdminPanel({
         excerpt,
         content,
         imageUrl: '',
-        date: videoStatus
+        date: videoStatus,
+        scheduledAt: scheduledTime
       });
       showStatus('Vídeo/Live adicionado com sucesso! 🎬');
     }
@@ -1268,6 +1272,7 @@ export default function AdminPanel({
     setContent('');
     setAuthor('');
     setVideoStatus('Ao Vivo 🔴');
+    setScheduledTime('');
     playSuccessSound();
   };
 
@@ -1547,7 +1552,7 @@ export default function AdminPanel({
                     required
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="space-y-1.5">
                     <label className="block text-xs font-bold uppercase tracking-wider text-gray-400">Status / Distintivo *</label>
                     <select 
@@ -1556,10 +1561,21 @@ export default function AdminPanel({
                       className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs font-bold text-white focus:outline-none focus:border-yellow-400"
                     >
                       <option value="Ao Vivo 🔴">Ao Vivo 🔴</option>
+                      <option value="Estreia 🍿">Estreia 🍿</option>
+                      <option value="Agendado 📆">Agendado 📆</option>
                       <option value="Vídeo Novo 🎬">Vídeo Novo 🎬</option>
                       <option value="Próxima Live 📆">Próxima Live 📆</option>
                       <option value="Evento PK XD 🌟">Evento PK XD 🌟</option>
                     </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-400">Data e Hora (Agendamento)</label>
+                    <input 
+                      type="datetime-local" 
+                      value={scheduledTime} 
+                      onChange={(e) => setScheduledTime(e.target.value)}
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2 text-sm font-semibold text-white focus:outline-none focus:border-yellow-400"
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <label className="block text-xs font-bold uppercase tracking-wider text-gray-400">Criador Canal</label>

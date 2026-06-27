@@ -1236,10 +1236,10 @@ export default function FanLevelSection({
             <div className="flex items-center justify-between">
               <h4 className="font-sans font-black text-sm text-white uppercase tracking-wider flex items-center gap-2">
                 <Trophy className="w-4 h-4 text-yellow-500" />
-                <span>Ranking Oficial de Fanáticos</span>
+                <span>Ranking Oficial de PKXDoidos</span>
               </h4>
               <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-black">
-                Top Criadores & Colecionadores
+                Top PKXDoidos & Ativos
               </span>
             </div>
             <p className="text-xs text-gray-300 leading-normal">

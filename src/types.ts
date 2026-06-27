@@ -7,6 +7,7 @@ export interface NewsItem {
   imageUrl: string;
   date: string;
   author: string;
+  scheduledAt?: string;
 }
 
 export interface SpoilerConfig {
