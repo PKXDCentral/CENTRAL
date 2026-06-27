@@ -2,11 +2,6 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Default deny catch-all
-    match /{document=**} {
-      allow read, write: if false;
-    }
-
     // Helper functions
     function isSignedIn() {
       return request.auth != null;
@@ -24,6 +19,19 @@ service cloud.firestore {
     function isDeletable() {
       return isEmailAdmin()
              || (resource != null && resource.data != null && 'admin_secret' in resource.data && resource.data.admin_secret == "pkxd2026_super_secret_admin_key");
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
     }
 
     // News rules
@@ -60,14 +68,6 @@ service cloud.firestore {
       allow create: if isAdmin();
       allow update: if isAdmin() || (incoming().diff(existing()).affectedKeys().hasOnly(['likes']) && incoming().likes == existing().likes + 1);
       allow delete: if isDeletable();
-    }
-
-    function incoming() {
-      return request.resource.data;
-    }
-
-    function existing() {
-      return resource.data;
     }
 
     // Shorts rules
