@@ -33,8 +33,7 @@ import {
   Menu,
   ChevronRight,
   AlertTriangle,
-  Trash2,
-  Palette
+  Trash2
 } from 'lucide-react';
 import { playTapSound, playLevelUpSound, playSuccessSound } from './utils/audio';
 
@@ -126,24 +125,6 @@ export default function App() {
 
   const [pastSpoilerToEdit, setPastSpoilerToEdit] = useState<PastSpoiler | null>(null);
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
-
-  const [siteTheme, setSiteTheme] = useState<'default' | 'neutral'>(() => {
-    try {
-      return (localStorage.getItem('pkxd_site_theme') as 'default' | 'neutral') || 'default';
-    } catch (e) {
-      return 'default';
-    }
-  });
-
-  const toggleTheme = () => {
-    const newTheme = siteTheme === 'default' ? 'neutral' : 'default';
-    setSiteTheme(newTheme);
-    try {
-      localStorage.setItem('pkxd_site_theme', newTheme);
-    } catch (e) {
-      console.warn(e);
-    }
-  };
 
   // State hooks for new components
   const [featuredList, setFeaturedList] = useState<FeaturedVideo[]>([]);
@@ -1655,7 +1636,7 @@ export default function App() {
   };
 
   return (
-    <div id="pkxd-app-root" className={`min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-yellow-400 selection:text-black pb-16 relative overflow-x-hidden bg-pkxd-texture ${siteTheme === 'neutral' ? 'theme-neutral' : ''}`}>
+    <div id="pkxd-app-root" className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-yellow-400 selection:text-black pb-16 relative overflow-x-hidden bg-pkxd-texture">
       
       {/* Premium ambient space backdrop glows */}
       <div className="absolute top-1/4 right-[10%] w-[500px] h-[500px] pointer-events-none select-none rounded-full" style={{ backgroundImage: 'radial-gradient(circle, var(--glow-1) 0%, transparent 70%)' }} />
@@ -1750,26 +1731,6 @@ export default function App() {
 
           {/* Action Links */}
           <div className="flex items-center gap-2">
-
-            {/* Theme Toggle Button */}
-            <button 
-              type="button"
-              onClick={() => {
-                triggerAudio('tap');
-                toggleTheme();
-              }}
-              className={`border-2 p-2.5 px-3 rounded-2xl transition-all cursor-pointer flex items-center gap-1.5 text-[11px] font-extrabold shadow-md ${
-                siteTheme === 'neutral'
-                  ? 'bg-amber-500 text-black border-amber-500/60 hover:bg-amber-400'
-                  : 'bg-purple-800 text-purple-200 border-purple-500/50 hover:bg-purple-900'
-              }`}
-              title={siteTheme === 'neutral' ? "Alternar para Tema PKXD (Colorido)" : "Alternar para Tema Neutro (Branco, Metal, Dourado e Roxo)"}
-            >
-              <Palette className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">
-                {siteTheme === 'neutral' ? 'TEMA NEUTRO 🌟' : 'TEMA PKXD 🎨'}
-              </span>
-            </button>
 
             {/* Notification center bell with badge! */}
             <button 

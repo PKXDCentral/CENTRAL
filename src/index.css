@@ -178,13 +178,74 @@
   box-shadow: 0 10px 30px -10px rgba(109, 40, 217, 0.06) !important;
 }
 
-/* Micro Header Banner - Royal purple */
+/* Micro Header Banner - Ultra Elegant White & Gold */
 .theme-neutral .bg-gradient-to-r.from-purple-800.via-pink-600.to-purple-900 {
-  background: linear-gradient(to right, #5b21b6, #7c3aed, #5b21b6) !important;
+  background: #ffffff !important;
+  border-bottom: 2px solid rgba(212, 175, 55, 0.25) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02) !important;
 }
 
 .theme-neutral .bg-gradient-to-r.from-purple-800.via-pink-600.to-purple-900 * {
-  color: #ffffff !important;
+  color: #4a5568 !important;
+}
+
+.theme-neutral .bg-gradient-to-r.from-purple-800.via-pink-600.to-purple-900 strong {
+  color: #c59b27 !important;
+}
+
+.theme-neutral .bg-gradient-to-r.from-purple-800.via-pink-600.to-purple-900 span.bg-black\/30 {
+  background-color: #f5f3ff !important;
+  color: #7c3aed !important;
+  border: 1px solid rgba(124, 58, 237, 0.1) !important;
+}
+
+/* Elegant Chic Navigation Header */
+.theme-neutral #nav-header {
+  background-color: #ffffff !important;
+  border-bottom: 4px solid #d4af37 !important;
+  box-shadow: 0 4px 25px rgba(212, 175, 55, 0.08) !important;
+}
+
+.theme-neutral #nav-header h1 {
+  background: linear-gradient(135deg, #111111 0%, #4a5568 50%, #718096 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-fill-color: transparent !important;
+  font-family: "Fredoka", sans-serif !important;
+}
+
+.theme-neutral #nav-header h1 span {
+  color: #d4af37 !important;
+  -webkit-text-fill-color: #d4af37 !important;
+}
+
+.theme-neutral #nav-header p {
+  color: #7c3aed !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+}
+
+.theme-neutral #nav-header button {
+  background: #ffffff !important;
+  color: #7c3aed !important;
+  border: 2px solid rgba(124, 58, 237, 0.2) !important;
+  border-bottom-width: 4px !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.06) !important;
+}
+
+.theme-neutral #nav-header button * {
+  color: #7c3aed !important;
+}
+
+.theme-neutral #nav-header button:hover {
+  background: #fbf9ff !important;
+  border-color: #d4af37 !important;
+}
+
+.theme-neutral #nav-header button:hover * {
+  color: #b89753 !important;
 }
 
 /* Playful Royal Purple buttons */
@@ -207,6 +268,45 @@
 
 .theme-neutral button:not(.bg-emerald-500):not(.bg-red-500):not(.bg-zinc-800):not(.bg-amber-500) * {
   color: #ffffff !important;
+}
+
+/* Premium Chic Masthead Hero section overrides */
+.theme-neutral #masthead-hero {
+  background: linear-gradient(180deg, #ffffff 0%, #faf9f6 100%) !important;
+  border-bottom: 2px solid rgba(212, 175, 55, 0.15) !important;
+}
+
+.theme-neutral #masthead-hero h2 {
+  background: linear-gradient(135deg, #111111 0%, #3a3a3c 50%, #636366 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-fill-color: transparent !important;
+  font-family: "Fredoka", sans-serif !important;
+}
+
+.theme-neutral #masthead-hero h2 span {
+  background: linear-gradient(135deg, #7c3aed 0%, #d4af37 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-fill-color: transparent !important;
+}
+
+.theme-neutral #masthead-hero p {
+  color: #4b5563 !important;
+  font-weight: 500 !important;
+}
+
+.theme-neutral #masthead-hero .bg-pink-500\/10 {
+  background-color: #f5f3ff !important;
+  border-color: rgba(124, 58, 237, 0.25) !important;
+  color: #7c3aed !important;
+}
+
+.theme-neutral #masthead-hero .bg-pink-500\/10 * {
+  color: #7c3aed !important;
+  fill: #7c3aed !important;
 }
 
 @theme {
