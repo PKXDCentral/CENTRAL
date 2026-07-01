@@ -27,10 +27,114 @@ var import_path = __toESM(require("path"), 1);
 var import_vite = require("vite");
 var import_genai = require("@google/genai");
 var import_dotenv = __toESM(require("dotenv"), 1);
+var import_web_push = __toESM(require("web-push"), 1);
+
+// src/lib/firebase-admin.ts
+var import_app = require("firebase-admin/app");
+var import_auth = require("firebase-admin/auth");
+var import_firestore = require("firebase-admin/firestore");
+
+// firebase-applet-config.json
+var firebase_applet_config_default = {
+  projectId: "pkxd-e817c",
+  appId: "1:932539609984:web:74c5cc5650c7807e6c4765",
+  apiKey: "AIzaSyBFIEDUk1UMeiNU_yv0VscVUwVyFuSffi0",
+  authDomain: "pkxd-e817c.firebaseapp.com",
+  storageBucket: "pkxd-e817c.firebasestorage.app",
+  messagingSenderId: "932539609984",
+  measurementId: "G-FSFT099FH4"
+};
+
+// src/lib/firebase-admin.ts
+if (!(0, import_app.getApps)().length) {
+  (0, import_app.initializeApp)({
+    projectId: firebase_applet_config_default.projectId
+  });
+}
+var adminAuth = (0, import_auth.getAuth)();
+var adminDb = (0, import_firestore.getFirestore)();
+
+// server.ts
 import_dotenv.default.config();
 var app = (0, import_express.default)();
 var PORT = 3e3;
 app.use(import_express.default.json());
+var vapidKeys = {
+  publicKey: "BPmNLwhO3NAUPTV8dvmbTQlKgZdIERcVxQjjv7LYMHDH-kGlM1bHnqdV9IFxdBN4d5006fw7eyNXPDzw2Y6Xlzo",
+  privateKey: "k1PdAotohasg-Qtk5XSGoUgEZmhL63Ia_yN8UtLoxd0"
+};
+import_web_push.default.setVapidDetails(
+  "mailto:kawanyuri35@gmail.com",
+  vapidKeys.publicKey,
+  vapidKeys.privateKey
+);
+var serverStartTime = Date.now() - 5e3;
+async function sendPushNotificationToAll(title, body, url = "/") {
+  console.log(`[Web Push] Disparando notifica\xE7\xE3o nativa para todos: "${title}" - "${body}"`);
+  try {
+    const subsSnap = await adminDb.collection("push_subscriptions").get();
+    if (subsSnap.empty) {
+      console.log("[Web Push] Nenhuma inscri\xE7\xE3o encontrada no banco.");
+      return;
+    }
+    const payload = JSON.stringify({
+      title,
+      body,
+      url
+    });
+    const sendPromises = subsSnap.docs.map(async (doc) => {
+      const subData = doc.data();
+      try {
+        await import_web_push.default.sendNotification(subData.subscription, payload);
+      } catch (err) {
+        if (err.statusCode === 410 || err.statusCode === 404) {
+          console.log(`[Web Push] Removendo inscri\xE7\xE3o inativa: ${doc.id}`);
+          await doc.ref.delete();
+        } else {
+          console.error(`[Web Push] Erro ao enviar para ${doc.id}:`, err);
+        }
+      }
+    });
+    await Promise.allSettled(sendPromises);
+    console.log("[Web Push] Disparo em lote finalizado.");
+  } catch (err) {
+    console.error("[Web Push] Erro geral ao disparar notifica\xE7\xF5es:", err);
+  }
+}
+try {
+  adminDb.collection("notifications").onSnapshot((snapshot) => {
+    snapshot.docChanges().forEach(async (change) => {
+      if (change.type === "added") {
+        const data = change.doc.data();
+        if (data && data.createdAt && data.createdAt > serverStartTime) {
+          await sendPushNotificationToAll(data.title, data.body, "/");
+        }
+      }
+    });
+  });
+  console.log("[Web Push] Ouvinte em tempo real da cole\xE7\xE3o 'notifications' ativado.");
+} catch (snapshotErr) {
+  console.error("Erro ao configurar Firestore Snapshot Listener para Web Push:", snapshotErr);
+}
+app.post("/api/push-subscribe", async (req, res) => {
+  const subscription = req.body;
+  if (!subscription || !subscription.endpoint) {
+    res.status(400).json({ error: "Inscri\xE7\xE3o inv\xE1lida" });
+    return;
+  }
+  try {
+    const subscriptionId = Buffer.from(subscription.endpoint).toString("base64").replace(/=/g, "").substring(0, 50);
+    const subRef = adminDb.collection("push_subscriptions").doc(subscriptionId);
+    await subRef.set({
+      subscription,
+      createdAt: Date.now()
+    });
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Erro ao salvar inscri\xE7\xE3o Push:", err);
+    res.status(500).json({ error: err.message || "Erro interno do servidor" });
+  }
+});
 var aiClient = null;
 function getAI() {
   if (!aiClient) {
