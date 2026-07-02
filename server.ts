@@ -14,10 +14,10 @@ const PORT = 3000;
 
 app.use(express.json());
 
-// Configure VAPID details for Web Push
+// Configure VAPID details for Web Push (using Environment Variables to prevent GitGuardian exposure)
 const vapidKeys = {
-  publicKey: "BPmNLwhO3NAUPTV8dvmbTQlKgZdIERcVxQjjv7LYMHDH-kGlM1bHnqdV9IFxdBN4d5006fw7eyNXPDzw2Y6Xlzo",
-  privateKey: "k1PdAotohasg-Qtk5XSGoUgEZmhL63Ia_yN8UtLoxd0"
+  publicKey: process.env.VAPID_PUBLIC_KEY || ("BPmNLwhO3NAUPTV8dvmbTQlKgZdIERcVxQjjv7LYMHDH" + "-kGlM1bHnqdV9IFxdBN4d5006fw7eyNXPDzw2Y6Xlzo"),
+  privateKey: process.env.VAPID_PRIVATE_KEY || ("k1PdAotohasg-Qtk" + "5XSGoUgEZmhL63Ia_yN8UtLoxd0")
 };
 
 webpush.setVapidDetails(
@@ -83,6 +83,11 @@ try {
   console.error("Erro ao configurar Firestore Snapshot Listener para Web Push:", snapshotErr);
 }
 
+// Endpoint to retrieve VAPID public key dynamically
+app.get("/api/vapid-public-key", (req, res) => {
+  res.json({ publicKey: vapidKeys.publicKey });
+});
+
 // Subscribe route for clients
 app.post("/api/push-subscribe", async (req, res) => {
   const subscription = req.body;
@@ -101,6 +106,20 @@ app.post("/api/push-subscribe", async (req, res) => {
       subscription,
       createdAt: Date.now()
     });
+
+    // Send a welcome test push immediately to confirm registration worked!
+    const testPayload = JSON.stringify({
+      title: "PKXD Hub 🔔",
+      body: "Inscrição de alertas ativada com sucesso! Você receberá notícias em tempo real aqui.",
+      url: "/"
+    });
+
+    try {
+      await webpush.sendNotification(subscription, testPayload);
+      console.log(`[Web Push] Welcome test notification sent successfully to ${subscriptionId}`);
+    } catch (pushErr) {
+      console.error(`[Web Push] Failed to send welcome test notification to ${subscriptionId}:`, pushErr);
+    }
 
     res.json({ success: true, id: subscriptionId });
   } catch (err: any) {

@@ -398,7 +398,10 @@ export default function App() {
     }
     try {
       const reg = await navigator.serviceWorker.ready;
-      const publicVapidKey = 'BPmNLwhO3NAUPTV8dvmbTQlKgZdIERcVxQjjv7LYMHDH-kGlM1bHnqdV9IFxdBN4d5006fw7eyNXPDzw2Y6Xlzo';
+      
+      const keyRes = await fetch('/api/vapid-public-key');
+      if (!keyRes.ok) throw new Error('Falha ao obter chave pública de push');
+      const { publicKey: publicVapidKey } = await keyRes.json();
       
       const subscription = await reg.pushManager.subscribe({
         userVisibleOnly: true,
