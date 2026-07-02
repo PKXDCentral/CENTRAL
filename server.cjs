@@ -28,6 +28,7 @@ var import_vite = require("vite");
 var import_genai = require("@google/genai");
 var import_dotenv = __toESM(require("dotenv"), 1);
 var import_web_push = __toESM(require("web-push"), 1);
+var import_crypto = __toESM(require("crypto"), 1);
 
 // src/lib/firebase-admin.ts
 var import_app = require("firebase-admin/app");
@@ -123,13 +124,14 @@ app.post("/api/push-subscribe", async (req, res) => {
     return;
   }
   try {
-    const subscriptionId = Buffer.from(subscription.endpoint).toString("base64").replace(/=/g, "").substring(0, 50);
+    const subscriptionId = import_crypto.default.createHash("sha256").update(subscription.endpoint).digest("hex");
+    console.log(`[Web Push] Nova inscri\xE7\xE3o registrada! ID: ${subscriptionId}, Endpoint: ${subscription.endpoint}`);
     const subRef = adminDb.collection("push_subscriptions").doc(subscriptionId);
     await subRef.set({
       subscription,
       createdAt: Date.now()
     });
-    res.json({ success: true });
+    res.json({ success: true, id: subscriptionId });
   } catch (err) {
     console.error("Erro ao salvar inscri\xE7\xE3o Push:", err);
     res.status(500).json({ error: err.message || "Erro interno do servidor" });
